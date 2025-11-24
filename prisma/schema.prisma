@@ -11,9 +11,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
 }
-
 enum UserRole {
   CUSTOMER
   ADMIN
@@ -67,7 +66,7 @@ model Flight{
   arrivalDate         DateTime
   destinationCity     String
   destinationCityCode String
-  price               BigInt
+  price               Int
   seats               FlightSeat[]
   tickets             Ticket[]
 }

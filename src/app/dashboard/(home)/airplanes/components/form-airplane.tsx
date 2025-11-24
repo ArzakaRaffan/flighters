@@ -29,7 +29,7 @@ const SubmitButton: FC<SubmitButtonProps> = ({type}) => {
     const { pending } = useFormStatus()
     return (
         <div className="flex justify-center">
-            <Button disabled={pending} type="submit" className="px-6 py-2 mt-12">
+            <Button disabled={pending} type="submit" className="px-15 py-5 mt-15">
                 {type == 'ADD'? 'ADD' : "EDIT"}
             </Button>
         </div>
