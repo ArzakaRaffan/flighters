@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { SeatType } from "@prisma/client"
+import { FlightSeat, SeatType } from "@prisma/client"
 import { StringOrTemplateHeader } from "@tanstack/react-table"
 
 export function cn(...inputs: ClassValue[]) {
@@ -25,4 +25,25 @@ export const generateSeatPerClass = (flightId: string) => {
     }
   }
   return seats
+}
+
+
+export const seatMapping = (seat: FlightSeat[]) => {
+    const totalEconomy = seat.filter(item => item.type === "ECONOMY").length
+    const totalBusiness = seat.filter(item => item.type === "BUSINESS").length
+    const totalFirst = seat.filter(item => item.type === "FIRST").length
+
+    const economy = seat.filter(item => item.type === "ECONOMY" && !item.isBooked).length
+    const business = seat.filter(item => item.type === "BUSINESS" && !item.isBooked).length
+    const first = seat.filter(item => item.type === "FIRST" && !item.isBooked).length
+
+    return{
+        economy,
+        business,
+        first,
+
+        totalEconomy,
+        totalBusiness,
+        totalFirst,
+    }
 }

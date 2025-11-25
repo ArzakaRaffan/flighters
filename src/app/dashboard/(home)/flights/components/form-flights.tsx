@@ -6,10 +6,10 @@ import { Label } from '@radix-ui/react-label';
 import React, { useActionState, type FC } from 'react'
 import { useFormStatus } from 'react-dom';
 import type { Airplane, Flight } from '@prisma/client';
-import Image from 'next/image'
-import { getUrl } from '@/lib/supabase'
+import { updateFlight } from '../lib/action';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { saveFlight } from '../lib/action';
+import { dateFormat } from './column-route-flight';
 
 
 // interface FormAirplaneProps {
@@ -23,6 +23,8 @@ import { saveFlight } from '../lib/action';
 
 interface FlightFormProps {
     airplanes: Airplane[]
+    type?: "ADD" | "EDIT"
+    defaultValues?: Flight | null
 }
 
 const initialFormState: ActionResult = {
@@ -30,21 +32,27 @@ const initialFormState: ActionResult = {
     errorDesc: []
 }
 
-const SubmitButton: FC = ({ }) => {
+const SubmitButton: FC<{ type?: "ADD" | "EDIT" }> = ({ type }) => {
     const { pending } = useFormStatus()
     return (
-        <div className="flex justify-center">
-            <Button disabled={pending} type="submit" className="px-15 py-5 mt-15">
-                Add
-            </Button>
-        </div>
+        <Button className='mt-5' disabled={pending} type="submit">
+            {type === "EDIT" ? "Save Changes" : "Add"}
+        </Button>
     )
 }
 
-export default function FlightForm({ airplanes }: FlightFormProps) {
-    console.log(airplanes)
+export default function FlightForm({ airplanes, defaultValues, type }: FlightFormProps) {
 
-    const [state, formAction] = useActionState(saveFlight, initialFormState)
+    console.log("Type: ", type)
+
+    const updateFlightWithId = (_state: ActionResult, formData: FormData) => 
+        updateFlight(null, defaultValues ? defaultValues.id : null, formData);
+
+    const [state, formAction] = useActionState(
+        type == "ADD" ? saveFlight: updateFlightWithId,
+        initialFormState)
+
+    console.log(defaultValues)
 
     return (
         <form action={formAction} className="w-full max-w-screen-xl mx-auto px-4">
@@ -63,7 +71,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
                 <div className='space-y-2 flex flex-col'>
                     <Label htmlFor='planeId' className='font-light text-sm ml-1'>Choose Airplane</Label>
-                    <Select name='planeId'>
+                    <Select name='planeId' defaultValue={defaultValues?.plane_id || undefined}>
                         <SelectTrigger className="w-[400px] px-4 py-5 mt-2 " id='plane_id'>
                             <SelectValue placeholder="Airplanes" />
                         </SelectTrigger>
@@ -83,6 +91,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         type='number'
                         required
                         min={0}
+                        defaultValue={defaultValues?.price}
                         className='mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                     <span className='text-xs text-gray-600 ml-3.5'>For Business class there will be an additional of $50 and for First class there will be an additional of $100</span>
@@ -97,6 +106,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         name='departureCity'
                         id='departureCity'
                         required
+                        defaultValue={defaultValues?.departureCity}
                         className='mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
@@ -107,6 +117,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         id='departureDate'
                         type='datetime-local'
                         required
+                        defaultValue={dateFormat(defaultValues?.departureDate ?? "", "YYYY-MM-DDTHH:mm")}
                         className='font-extralight mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
@@ -117,6 +128,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         name='departureCityCode'
                         id='departureCityCode'
                         required
+                        defaultValue={defaultValues?.departureCityCode}
                         className='mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
@@ -127,6 +139,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         name='destinationCity'
                         id='destinationCity'
                         required
+                        defaultValue={defaultValues?.destinationCity}
                         className='mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
@@ -137,6 +150,7 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         id='arrivalDate'
                         type='datetime-local'
                         required
+                        defaultValue={dateFormat(defaultValues?.arrivalDate ?? "", "YYYY-MM-DDTHH:mm")}
                         className='font-extralight mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
@@ -147,11 +161,12 @@ export default function FlightForm({ airplanes }: FlightFormProps) {
                         name='destinationCityCode'
                         id='destinationCityCode'
                         required
+                        defaultValue={defaultValues?.destinationCityCode}
                         className='mt-2 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-700 focus:border-grayring-gray-700 transition duration-200'
                     />
                 </div>
             </div>
-            <SubmitButton />
+            <SubmitButton type={type} />
         </form>
     )
 }

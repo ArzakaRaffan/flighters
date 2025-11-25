@@ -9,7 +9,7 @@ export const metadata: Metadata ={
     title: 'Dashboard | Add Flight'
 }
 
-const CreateFLightPage: FC = async () => {
+const CreateFlightPage: FC = async () => {
     const airplanes = await getAirplanes()
 
     return (
@@ -19,9 +19,9 @@ const CreateFLightPage: FC = async () => {
                     <PlaneTakeoff className='mt-1 mr-5' />Add Flight
                 </div>
             </div>
-            <FlightForm airplanes={airplanes}/>
+            <FlightForm airplanes={airplanes} type='ADD'/>
         </>
     )
 }
 
-export default CreateFLightPage
+export default CreateFlightPage
